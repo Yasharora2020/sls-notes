@@ -45,5 +45,11 @@ To obtain an access token, follow these steps:
 1. Go to the AWS Cognito Console, select the User Pool created by the deployment, and click on "App clients".
 2. Note down the `App client id` value for the client created by the deployment.
 3. Go to the "Domain name" section of the User Pool console and note down the `Domain` value.
-4. Use the `Username` and `Password` of the user created earlier to authenticate and obtain an access token:
+4. Use the `Username` and `Password` of the user created earlier to authenticate and obtain an access token
+
+
+
+### Working on the Front-end Application
+
+
 
