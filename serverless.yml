@@ -1,0 +1,138 @@
+service: notes-api
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  stage: ${opt:stage, 'dev'}
+  profile: macbook
+  region: ap-southeast-2
+
+plugins:
+  - serverless-python-requirements
+  - serverless-iam-roles-per-function
+
+custom:
+  pythonRequirements:
+    dockerizePip: false
+
+functions:
+  authorizer:
+    handler: authtry.handler
+    environment:
+      COGNITO_USERPOOL_ID: !Ref cognitoUserPool
+      COGNITO_WEB_CLIENT_ID: !Ref cognitoUserPoolWebclient
+  
+
+  createNote:
+    handler: handler.createNote
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: !GetAtt notesTable.Arn
+    events:
+      - http:
+          method: post
+          path: notes
+          cors: true
+          #authorizer: authorizer
+          
+
+  updateNote:
+    handler: handler.updateNote
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: !GetAtt notesTable.Arn
+    events:
+      - http:
+          method: put
+          path: notes/{id}
+          cors: true
+          #authorizer: authorizer
+         
+          
+
+  deleteNote:
+    handler: handler.deleteNote
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: !GetAtt notesTable.Arn
+    events:
+      - http:
+          method: delete
+          path: notes/{id}
+          cors: true
+          #authorizer: authorizer
+          
+          
+
+
+  getAllNotes:
+    handler: handler.getAllNotes
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Scan
+        Resource: !GetAtt notesTable.Arn
+    events:
+      - http:
+          method: get
+          path: notes
+          integration: lambda
+          cors:
+            origins:
+              - "http://localhost:3000"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'http://localhost:3000'"
+          #authorizer: 
+          #  name: userpool_authorizer
+          #  arn: ${ssm:/notes/${self:provider.stage}/userPoolArn}
+
+
+  getNoteById:
+    handler: handler.getNoteById
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: !GetAtt notesTable.Arn
+    events:
+      - http:
+          method: get
+          path: notes/{id}
+          integration: lambda
+          cors:
+            origins:
+              - "http://localhost:3000"
+          request:
+            parameters:
+              paths:
+                id: true
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'http://localhost:3000'"
+          
+
+
+resources:
+  Resources: ${file(resources.yml)}
+
+  
+
