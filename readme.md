@@ -36,7 +36,7 @@ To use the application, you need to create a user in the Cognito User Pool.
 2. Click on "Create user" and fill in the required details.
 3. After creating the user, note down the `Username` value.
 
-You can now use any API client or the provided front-end application to interact with the Notes API. The endpoints are secured with Cognito User Pool, so you need to obtain a valid access token to access the API.
+You can now use any API client to interact with the Notes API. The endpoints are secured with Cognito User Pool, so you need to obtain a valid access token to access the API.
 
 ### Obtaining an Access Token
 
